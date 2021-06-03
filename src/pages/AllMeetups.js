@@ -1,31 +1,39 @@
 import MeetupList from "../components/meetups/MeetupList";
-import React from "react";
+import React, {useState, useEffect} from "react";
+import axios from "axios";
+
 
 function AllMeetups() {
-    const Dummy_data = [
-        {
-            id : '1',
-            title: 'This is the first data',
-            image: 'https://www.worldatlas.com/r/w960-q80/upload/f7/a7/ff/bonifacio-corsica.jpg',
-            description: 'Anything'
+    const [isLoading, setIsLoading] = useState(true);
+    const [loadedMeetups, setLoadedMeetups] = useState([]);
+
+    useEffect(
+        () => {
+            setIsLoading(false);
+            axios.get('https://react-meetup-bb26c-default-rtdb.firebaseio.com/meetups.json').then((data) => {
+
+                const meetUps = [];
+                for(const key in data.data){
+                    const meetup = {
+                        id: key,
+                        ...data.data[key]
+                    }
+                    meetUps.push(meetup);
+                }
+                setLoadedMeetups(meetUps);
+            });
         },
-        {
-            id : '2',
-            title: 'This is the second data',
-            image: 'https://www.worldatlas.com/r/w960-q80/upload/f7/a7/ff/bonifacio-corsica.jpg',
-            description: 'Anything'
-        },
-        {
-            id : '3',
-            title: 'This is the third data',
-            image: 'https://www.worldatlas.com/r/w960-q80/upload/f7/a7/ff/bonifacio-corsica.jpg',
-            description: 'Anything'
-        }
-    ]
+        []
+    )
+
+    if (isLoading){
+        return <div>Loading...</div>
+    }
+
     return (
         <section>
                 <h1>All Meetups</h1>
-               <MeetupList meetups={Dummy_data} />
+               <MeetupList meetups={loadedMeetups} />
         </section>
     )
 }
